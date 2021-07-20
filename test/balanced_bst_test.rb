@@ -1,3 +1,5 @@
+# frozen_string_literal: false
+
 require 'minitest/autorun'
 require 'minitest/reporters'
 Minitest::Reporters.use!
@@ -5,10 +7,12 @@ Minitest::Reporters.use!
 require_relative '../lib/balanced_bst'
 
 class NodeTest < MiniTest::Test
+  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/MethodLength
   def test_comparable
-    a = Tree::Node.new(5)
-    b = Tree::Node.new(6)
-    c = Tree::Node.new(5)
+    a = BalancedBST::Node.new(5)
+    b = BalancedBST::Node.new(6)
+    c = BalancedBST::Node.new(5)
 
     assert(a == c)
     refute(a == b)
@@ -24,29 +28,42 @@ end
 
 class TreeTest < MiniTest::Test
   def setup
-    @letters = Tree.new(('A'..'K').to_a)
+    @letters = BalancedBST::Tree.new(('A'..'K').to_a)
+  end
+
+  def test_tree_must_have_at_least_one_element
+    assert_raises(BalancedBST::EmptyCollectionError) do
+      BalancedBST::Tree.new([])
+    end
+  end
+
+  def test_find
+    expected = BalancedBST::Node.new('I')
+    actual = @letters.find('I')
+    assert_equal expected, actual
+    assert_nil @letters.find('T')
   end
 
   def test_level_order
-    expected = %W(F C I B E H K A D G J)
+    expected = %w[F C I B E H K A D G J]
     actual = @letters.level_order
     assert_equal expected, actual
   end
 
   def test_inorder
-    expected = %W(A B C D E F G H I J K)
+    expected = %w[A B C D E F G H I J K]
     actual = @letters.inorder
     assert_equal expected, actual
   end
 
   def test_preorder
-    expected = %W(F C B A E D I H G K J)
+    expected = %w[F C B A E D I H G K J]
     actual = @letters.preorder
     assert_equal expected, actual
   end
 
   def test_postorder
-    expected = %W(A B D E C G H J K I F)
+    expected = %w[A B D E C G H J K I F]
     actual = @letters.postorder
     assert_equal expected, actual
   end
@@ -101,4 +118,42 @@ class TreeTest < MiniTest::Test
     assert(@letters.balanced?)
     assert_same(@letters, same_tree)
   end
+
+  def test_delete
+    @letters.delete('F')
+    expected = %w[A B C D E G H I J K]
+    assert_equal expected, @letters.inorder
+
+    @letters.delete('I')
+    expected = %w[A B C D E G H J K]
+    assert_equal expected, @letters.inorder
+
+    @letters.delete('D')
+    expected = %w[A B C E G H J K]
+    assert_equal expected, @letters.inorder
+  end
+
+  # rubocop: disable Layout/HeredocIndentation
+  def test_pretty_print
+    expected = <<-MSG
+│       ┌── K
+│       │   └── J
+│   ┌── I
+│   │   └── H
+│   │       └── G
+└── F
+    │   ┌── E
+    │   │   └── D
+    └── C
+        └── B
+            └── A
+    MSG
+
+    assert_output(expected) do
+      @letters.pretty_print
+    end
+  end
+  # rubocop:enable Layout/HeredocIndentation
+  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/MethodLength
 end
