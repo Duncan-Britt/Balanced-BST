@@ -66,4 +66,39 @@ class TreeTest < MiniTest::Test
     assert_equal 2, @letters.depth('H')
     assert_equal 3, @letters.depth('D')
   end
+
+  def test_balanced
+    assert(@letters.balanced?)
+
+    @letters.insert('L')
+    assert(@letters.balanced?)
+
+    @letters.insert('M')
+    assert(@letters.balanced?)
+
+    @letters.insert('N')
+    refute(@letters.balanced?)
+  end
+
+  def test_rebalance
+    @letters.insert('L')
+    @letters.insert('M')
+    @letters.insert('N')
+    @letters.insert('O')
+    refute(@letters.balanced?)
+    new_tree = @letters.rebalance
+    assert(new_tree.balanced?)
+    refute_same(new_tree, @letters)
+  end
+
+  def test_rebalance!
+    @letters.insert('L')
+    @letters.insert('M')
+    @letters.insert('N')
+    @letters.insert('O')
+    refute(@letters.balanced?)
+    same_tree = @letters.rebalance!
+    assert(@letters.balanced?)
+    assert_same(@letters, same_tree)
+  end
 end

@@ -116,6 +116,29 @@ class Tree
 
   attr_accessor :root
 
+  def balanced?
+    if root.leaf?
+      true
+    elsif root.one_child?
+      root.child.leaf?
+    else
+      left_height = height(root.left.data)
+      right_height = height(root.right.data)
+      difference = (left_height - right_height).abs
+      difference <= 1
+    end
+  end
+
+  def rebalance
+    Tree.new(level_order)
+  end
+
+  def rebalance!
+    return self if balanced?
+    build_tree(level_order)
+    self
+  end
+
   def initialize(collection)
     if collection.empty?
       raise EmptyCollectionError.new("Array must contain at least one element")
@@ -132,6 +155,12 @@ class Tree
     replacement.left = root.left
     replacement.right = root.right
     self.root = replacement
+  end
+
+  def depth(data)
+    to_find = Node.new(data)
+    node = root
+    [up_edges(node.left, to_find), up_edges(node.right, to_find)].max
   end
 
   def find(data)
@@ -154,25 +183,6 @@ class Tree
   def height(data)
     node = find(data)
     [edges(node.left), edges(node.right)].max
-  end
-
-  def edges(node)
-    return 0 unless node
-    return 1 if node.leaf?
-    [edges(node.left), edges(node.right)].max + 1
-  end
-
-  def depth(data)
-    to_find = Node.new(data)
-    node = root
-    [up_edges(node.left, to_find), up_edges(node.right, to_find)].max
-  end
-
-  def up_edges(node, to_find, depth=0)
-    return 0 unless node
-    depth += 1
-    return depth if node == to_find
-    [up_edges(node.left, to_find, depth), up_edges(node.right, to_find, depth)].max
   end
 
   def inorder(node=root)
@@ -255,6 +265,19 @@ class Tree
     node.left = subtree(left_half) unless left_half.empty?
     node.right = subtree(right_half) unless right_half.empty?
     node
+  end
+
+  def edges(node)
+    return 0 unless node
+    return 1 if node.leaf?
+    [edges(node.left), edges(node.right)].max + 1
+  end
+
+  def up_edges(node, to_find, depth=0)
+    return 0 unless node
+    depth += 1
+    return depth if node == to_find
+    [up_edges(node.left, to_find, depth), up_edges(node.right, to_find, depth)].max
   end
 end
 
