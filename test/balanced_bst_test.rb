@@ -59,4 +59,11 @@ class TreeTest < MiniTest::Test
     @letters.insert('M')
     assert_equal 4, @letters.height('F')
   end
+
+  def test_depth
+    assert_equal 0, @letters.depth('F')
+    assert_equal 1, @letters.depth('C')
+    assert_equal 2, @letters.depth('H')
+    assert_equal 3, @letters.depth('D')
+  end
 end

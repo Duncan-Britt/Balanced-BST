@@ -153,8 +153,26 @@ class Tree
 
   def height(data)
     node = find(data)
-    edges = 0
-    
+    [edges(node.left), edges(node.right)].max
+  end
+
+  def edges(node)
+    return 0 unless node
+    return 1 if node.leaf?
+    [edges(node.left), edges(node.right)].max + 1
+  end
+
+  def depth(data)
+    to_find = Node.new(data)
+    node = root
+    [up_edges(node.left, to_find), up_edges(node.right, to_find)].max
+  end
+
+  def up_edges(node, to_find, depth=0)
+    return 0 unless node
+    depth += 1
+    return depth if node == to_find
+    [up_edges(node.left, to_find, depth), up_edges(node.right, to_find, depth)].max
   end
 
   def inorder(node=root)
