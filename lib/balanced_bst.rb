@@ -151,8 +151,18 @@ class Tree
     node
   end
 
-  def inorder
+  def height(data)
+    node = find(data)
+    edges = 0
     
+  end
+
+  def inorder(node=root)
+    collection = []
+    collection += inorder(node.left) if node.left
+    collection << node.data
+    collection += inorder(node.right) if node.right
+    collection
   end
 
   def insert(data)
@@ -162,11 +172,11 @@ class Tree
 
   def level_order
     node = root
-    collection = [node]
+    collection = [node.data]
     queue = node.children
     until queue.empty?
       child = queue.shift
-      collection << child
+      collection << child.data
       if child.one_child?
         queue << child.child
       elsif !child.leaf?
@@ -174,6 +184,22 @@ class Tree
       end
       node = child
     end
+    collection
+  end
+
+  def postorder(node=root)
+    collection = []
+    collection += postorder(node.left) if node.left
+    collection += postorder(node.right) if node.right
+    collection << node.data
+    collection
+  end
+
+  def preorder(node=root)
+    collection = []
+    collection << node.data
+    collection += preorder(node.left) if node.left
+    collection += preorder(node.right) if node.right
     collection
   end
 
@@ -214,8 +240,7 @@ class Tree
   end
 end
 
-bst = Tree.new(('A'..'Z').to_a)
+bst = Tree.new(('A'..'K').to_a)
+bst.insert('L')
+bst.insert('M')
 bst.pretty_print
-puts ''
-p bst.level_order
-p bst.inorder
